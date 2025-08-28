@@ -15,6 +15,13 @@ pipeline {
                 sh 'mvn test'
             }
         }
+
+        stage('Generate HTML Report') {
+            steps {
+                sh 'mvn surefire-report:report-only'
+            }
+        }
+        
         stage('Archive Reports') {
             steps {
                 junit '**/target/surefire-reports/*.xml'
@@ -24,32 +31,32 @@ pipeline {
     }
     post {
         success {
-            mail(
-                from: 'jenikins-unit-testing',
+            emailext(
                 to: 'sainiabhishek619@gmail.com',
                 subject: "Build SUCCESS: ${currentBuild.fullDisplayName}",
-                body: """Hey abhishek your Build has been succeeded.  
-Test Report link has been attached below 
+                body: """Hey Abhishek, your Build has been succeeded.  
 
-You can view the test reports and artifacts here:  
+HTML Test Report is attached.  
+
+You can also view the test reports and artifacts here:  
 ${env.BUILD_URL}artifact/
 
-Check Jenkins: ${env.BUILD_URL}"""
+Check Jenkins: ${env.BUILD_URL}""",
+                attachmentsPattern: 'target/site/surefire-report.html'
             )
         }
         failure {
-            mail(
-                from: 'jenikins-unit-testing',
+            emailext(
                 to: 'sainiabhishek619@gmail.com',
                 subject: "Build FAILED: ${currentBuild.fullDisplayName}",
-                body: """Please check your build has been failed 
+                body: """Please check, your build has failed.  
 
+Logs and reports (if available) are attached.  
 
-You can view the test reports and artifacts here:  
-${env.BUILD_URL}artifact/
-
-Check Jenkins: ${env.BUILD_URL}"""
+Check Jenkins: ${env.BUILD_URL}""",
+                attachLog: true,
+                attachmentsPattern: 'target/site/surefire-report.html'
             )
         }
-}
+    }
 }
