@@ -30,33 +30,28 @@ pipeline {
         }
     }
     post {
-        success {
-            emailext(
-                to: 'sainiabhishek619@gmail.com',
-                subject: "Build SUCCESS: ${currentBuild.fullDisplayName}",
-                body: """Hey Abhishek, your Build has been succeeded.  
+    success {
+        emailext(
+            to: 'sainiabhishek619@gmail.com',
+            subject: "Build SUCCESS: ${currentBuild.fullDisplayName}",
+            body: """Hello Abhishek,  
 
-HTML Test Report is attached.  
+Your build has completed successfully.  
+Please find the attached HTML test report for details.""",
+            attachmentsPattern: 'target/site/surefire-report.html'
+        )
+    }
+    failure {
+        emailext(
+            to: 'sainiabhishek619@gmail.com',
+            subject: "Build FAILED: ${currentBuild.fullDisplayName}",
+            body: """Hello Abhishek,  
 
-You can also view the test reports and artifacts here:  
-${env.BUILD_URL}artifact/
-
-Check Jenkins: ${env.BUILD_URL}""",
-                attachmentsPattern: 'target/site/surefire-report.html'
-            )
-        }
-        failure {
-            emailext(
-                to: 'sainiabhishek619@gmail.com',
-                subject: "Build FAILED: ${currentBuild.fullDisplayName}",
-                body: """Please check, your build has failed.  
-
-Logs and reports (if available) are attached.  
-
-Check Jenkins: ${env.BUILD_URL}""",
-                attachLog: true,
-                attachmentsPattern: 'target/site/surefire-report.html'
-            )
-        }
+Your build has failed.  
+Logs and test report (if available) are attached for review.""",
+            attachLog: true,
+            attachmentsPattern: 'target/site/surefire-report.html'
+        )
     }
 }
+
